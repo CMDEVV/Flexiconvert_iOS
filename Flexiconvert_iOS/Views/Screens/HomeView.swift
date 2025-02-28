@@ -16,6 +16,9 @@ import SwiftUI
 
 struct HomeView: View {
     
+    // Bool
+    @State var goToDetailView = false
+    
     let rows = [
         GridItem(.fixed(50))
     ]
@@ -88,33 +91,6 @@ struct HomeView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
                         
-                        Image("bk_img")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 226, height: 146)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(alignment: .bottomLeading){
-                                VStack(alignment: .leading, spacing: 8){
-                                    HStack{
-                                        // Add Icon
-                                        Image(systemName: "photo")
-                                            .foregroundStyle(Color(hex: 0x080f90))
-                                        
-                                        Text("Image.jpg")
-                                            .foregroundStyle(Color.white)
-                                            .font(.subheadline)
-                                    }
-                                    
-                                    Text("Added 02/26/25 11am")
-                                        .font(.subheadline)
-                                        .foregroundStyle(Color.white)
-                                }
-                                .padding(5)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .frame(height: 54)
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
                         
                     }
                 }
@@ -143,6 +119,9 @@ struct HomeView: View {
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: Color.gray.opacity(0.3), radius: 3, x: 0, y: 1)
+                        .onTapGesture {
+                            goToDetailView = true
+                        }
                         
                         HStack(spacing: 80){
                             Text("PNG")
@@ -191,10 +170,14 @@ struct HomeView: View {
                 
             }
             .padding()
+            .navigationDestination(isPresented: $goToDetailView){
+                DetailView()
+            }
 //            .padding(.top, 30)
             
             Spacer()
         }
+        
     }
 }
 
