@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D5702B392D8A696500AD5173 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D5702B382D8A696500AD5173 /* RealmSwift */; };
+		D5702B3A2D8A697600AD5173 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = D5702B382D8A696500AD5173 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D5CF46362D70195800EE48CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -22,6 +27,20 @@
 			remoteInfo = Flexiconvert_iOS;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D5702B3B2D8A697600AD5173 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D5702B3A2D8A697600AD5173 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D5CF46252D70195400EE48CD /* Flexiconvert_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flexiconvert_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5702B392D8A696500AD5173 /* RealmSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +122,7 @@
 				D5CF46212D70195400EE48CD /* Sources */,
 				D5CF46222D70195400EE48CD /* Frameworks */,
 				D5CF46232D70195400EE48CD /* Resources */,
+				D5702B3B2D8A697600AD5173 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -112,6 +133,7 @@
 			);
 			name = Flexiconvert_iOS;
 			packageProductDependencies = (
+				D5702B382D8A696500AD5173 /* RealmSwift */,
 			);
 			productName = Flexiconvert_iOS;
 			productReference = D5CF46252D70195400EE48CD /* Flexiconvert_iOS.app */;
@@ -195,6 +217,9 @@
 			);
 			mainGroup = D5CF461C2D70195400EE48CD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D5702B372D8A696500AD5173 /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D5CF46262D70195400EE48CD /* Products */;
 			projectDirPath = "";
@@ -399,6 +424,7 @@
 				DEVELOPMENT_TEAM = 6C6DL443YK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to save downloaded images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,6 +457,7 @@
 				DEVELOPMENT_TEAM = 6C6DL443YK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your Photos to save downloaded images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -564,6 +591,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D5702B372D8A696500AD5173 /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-cocoa.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D5702B382D8A696500AD5173 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D5702B372D8A696500AD5173 /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D5CF461D2D70195400EE48CD /* Project object */;
 }

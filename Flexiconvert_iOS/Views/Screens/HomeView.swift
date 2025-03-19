@@ -7,15 +7,13 @@
 
 
 import SwiftUI
+import RealmSwift
 
-// MARK: TODO
-// - Need to create Model for cards
-// - limit the number of recent files (max:3) (Later on once database is added)
-// - Navigation to Detail View
-// - Navigation to Recent Files View
+
 
 struct HomeView: View {
     
+    let realm = try! Realm()
     // Bool
     @State var goToDetailView = false
     
@@ -24,6 +22,7 @@ struct HomeView: View {
     ]
     
     var body: some View {
+        let recentFiles = realm.objects(RecentFilesRealmModel.self)
         NavigationStack{
             // MARK: Top Home
             VStack{
@@ -48,57 +47,59 @@ struct HomeView: View {
             
             // MARK: Recent Files
             
-            VStack{
-                HStack{
-                    Text("Recent Files")
-                        .font(.headline)
-                    
-                    Spacer()
-                    
-                    Text("show all")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.gray)
-                }
-                
-                ScrollView(.horizontal){
-                    LazyHGrid(rows: rows, alignment: .center, spacing: 12){
-                        // Files/images go here
-                        Image("bk_img")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 226, height: 146)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(alignment: .bottomLeading){
-                                VStack(alignment: .leading, spacing: 8){
-                                    HStack{
-                                        // Add Icon
-                                        Image(systemName: "photo")
-                                            .foregroundStyle(Color(hex: 0x080f90))
-                                        
-                                        Text("Image.jpg")
-                                            .foregroundStyle(Color.white)
-                                            .font(.subheadline)
-                                    }
-                                    
-                                    Text("Added 02/26/25 11am")
-                                        .font(.subheadline)
-                                        .foregroundStyle(Color.white)
-                                }
-                                .padding(5)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .frame(height: 54)
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
+            if !recentFiles.isEmpty{
+                VStack{
+                    HStack{
+                        Text("Recent Files")
+                            .font(.headline)
                         
-                        
+//                        Spacer()
+//
+//                        Text("show all")
+//                            .font(.subheadline)
+//                            .foregroundStyle(Color.gray)
                     }
+                    
+                    
+                    ScrollView(.horizontal){
+                        LazyHGrid(rows: rows, alignment: .center, spacing: 12){
+                            // Files/images go here
+                            Image("bk_img")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 226, height: 146)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(alignment: .bottomLeading){
+                                    VStack(alignment: .leading, spacing: 8){
+                                        HStack{
+                                            // Add Icon
+                                            Image(systemName: "photo")
+                                                .foregroundStyle(Color(hex: 0x080f90))
+                                            
+                                            Text("Image.jpg")
+                                                .foregroundStyle(Color.white)
+                                                .font(.subheadline)
+                                        }
+                                        
+                                        Text("Added 02/26/25 11am")
+                                            .font(.subheadline)
+                                            .foregroundStyle(Color.white)
+                                    }
+                                    .padding(5)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(height: 54)
+                                    .background(Color.gray.opacity(0.5))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                }
+                            
+                            
+                        }
+                    }
+                    .frame(height: 146)
                 }
-                .frame(height: 146)
+                .padding()
+                .padding(.top, 40)
             }
-            .padding()
-            .padding(.top, 40)
-          
             
             // MARK: Category
             
@@ -170,6 +171,7 @@ struct HomeView: View {
                 
             }
             .padding()
+            .padding(.top, recentFiles.isEmpty ? 20 : 0)
             .navigationDestination(isPresented: $goToDetailView){
                 DetailView()
             }

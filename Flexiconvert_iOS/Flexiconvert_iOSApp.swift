@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct Flexiconvert_iOSApp: App {
+    let migrator = Migrator()
+    
     var body: some Scene {
         WindowGroup {
                 TabBar()
