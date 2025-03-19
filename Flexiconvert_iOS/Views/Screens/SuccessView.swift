@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Photos
+import RealmSwift
 
 struct APIResponse: Codable{
 //    var id = UUID()
@@ -21,6 +22,9 @@ struct ResultItem: Codable, Hashable {
 
 struct SuccessView: View {
     @Environment(\.dismiss) var dismiss
+    let realm = try! Realm()
+    
+    
     let col = [
         GridItem(),
         GridItem(),
@@ -43,6 +47,14 @@ struct SuccessView: View {
         }
         return image
     }
+    
+    func formatDate(date: Date) -> String {
+          let formatter = DateFormatter()
+          formatter.dateFormat = "MM/dd/yy h a" // Format: 03/18/24 10 AM
+          formatter.amSymbol = "am"
+          formatter.pmSymbol = "pm"
+          return formatter.string(from: date)
+      }
 
     var body: some View {
         NavigationStack {
@@ -116,6 +128,22 @@ struct SuccessView: View {
             }
             .padding()
             .padding(.top, 30)
+            .onAppear{
+                let date = Date()
+                for data in convertedImages{
+                    for image in data.results{
+                        try! realm.write{
+                            let recentFilesList = RecentFilesRealmModel()
+                            recentFilesList.format = image.format
+                            recentFilesList.file_name = image.file_name
+                            recentFilesList.image = image.image
+                            recentFilesList.date = formatDate(date: date)
+                            
+                            realm.add(recentFilesList, update: .all)
+                        }
+                    }
+                }
+            }
             .navigationDestination(isPresented: $goToHome) {
                 HomeView()
             }

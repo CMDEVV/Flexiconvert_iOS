@@ -21,8 +21,20 @@ struct HomeView: View {
         GridItem(.fixed(50))
     ]
     
+    
+    func base64ToImage(_ base64: String) -> UIImage? {
+        guard let data = Data(base64Encoded: base64, options: .ignoreUnknownCharacters),
+              let image = UIImage(data: data) else {
+            return nil
+        }
+        return image
+    }
+    
+    @ObservedResults(RecentFilesRealmModel.self, sortDescriptor: SortDescriptor(keyPath: "date", ascending: false)) var recentFiles
+
+    
     var body: some View {
-        let recentFiles = realm.objects(RecentFilesRealmModel.self)
+//        let recentFiles = realm.objects(RecentFilesRealmModel.self)
         NavigationStack{
             // MARK: Top Home
             VStack{
@@ -33,9 +45,7 @@ struct HomeView: View {
                             .font(.largeTitle)
                             .foregroundStyle(Color.white)
                     }
-                    //.frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    // .background(Color.red)
                   
                     
                 }
@@ -53,7 +63,7 @@ struct HomeView: View {
                         Text("Recent Files")
                             .font(.headline)
                         
-//                        Spacer()
+                        Spacer()
 //
 //                        Text("show all")
 //                            .font(.subheadline)
@@ -63,34 +73,39 @@ struct HomeView: View {
                     
                     ScrollView(.horizontal){
                         LazyHGrid(rows: rows, alignment: .center, spacing: 12){
-                            // Files/images go here
-                            Image("bk_img")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 226, height: 146)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .overlay(alignment: .bottomLeading){
-                                    VStack(alignment: .leading, spacing: 8){
-                                        HStack{
-                                            // Add Icon
-                                            Image(systemName: "photo")
-                                                .foregroundStyle(Color(hex: 0x080f90))
-                                            
-                                            Text("Image.jpg")
-                                                .foregroundStyle(Color.white)
-                                                .font(.subheadline)
+                            ForEach(Array(recentFiles.prefix(4)), id: \._id){ image in
+                                if let uiImage = base64ToImage(image.image) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 226, height: 146)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        .overlay(alignment: .bottomLeading) {
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                HStack {
+                                                    Image(systemName: "photo")
+                                                        .foregroundStyle(Color(hex: 0x080f90))
+                                                    
+                                                    Text("\(image.format)")
+                                                        .foregroundStyle(Color.white)
+                                                        .font(.subheadline)
+                                                }
+                                                Text("Added \(image.date)")
+                                                    .foregroundStyle(Color.white)
+                                                    .font(.subheadline)
+                                            }
+                                            .padding(5)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .frame(height: 54)
+                                            .background(Color.gray.opacity(0.6))
+                                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                                       
                                         }
-                                        
-                                        Text("Added 02/26/25 11am")
-                                            .font(.subheadline)
-                                            .foregroundStyle(Color.white)
-                                    }
-                                    .padding(5)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .frame(height: 54)
-                                    .background(Color.gray.opacity(0.5))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                     
+                                } else {
+                                    Text("Invalid Image")
                                 }
+                            }
                             
                             
                         }
@@ -172,6 +187,9 @@ struct HomeView: View {
             }
             .padding()
             .padding(.top, recentFiles.isEmpty ? 20 : 0)
+            .onAppear{
+                
+            }
             .navigationDestination(isPresented: $goToDetailView){
                 DetailView()
             }

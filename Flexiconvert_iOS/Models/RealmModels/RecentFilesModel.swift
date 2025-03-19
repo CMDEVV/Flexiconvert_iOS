@@ -9,9 +9,11 @@ import Foundation
 import UIKit
 import RealmSwift
 
-class RecentFilesRealmModel: Object {
+class RecentFilesRealmModel: Object, Identifiable {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var format: String
+    @Persisted var file_name: String
     @Persisted var date: String
-    @Persisted var image: Data? = nil
+    @Persisted var image: String = ""
+//    @Persisted var image: Data? = nil
 }
