@@ -64,7 +64,7 @@ struct HomeView: View {
                             .font(.headline)
                         
                         Spacer()
-//
+                        
 //                        Text("show all")
 //                            .font(.subheadline)
 //                            .foregroundStyle(Color.gray)
@@ -74,7 +74,8 @@ struct HomeView: View {
                     ScrollView(.horizontal){
                         LazyHGrid(rows: rows, alignment: .center, spacing: 12){
                             ForEach(Array(recentFiles.prefix(4)), id: \._id){ image in
-                                if let uiImage = base64ToImage(image.image) {
+                              
+                                if let uiImage = base64ToImage(image.image.base64EncodedString()) {
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)

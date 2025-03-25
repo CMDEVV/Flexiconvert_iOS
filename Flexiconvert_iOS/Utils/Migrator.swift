@@ -14,7 +14,7 @@ class Migrator{
     }
 
     func updateSchema(){
-        let config = Realm.Configuration(schemaVersion: 2){ migration, oldSchemaVersion in
+        let config = Realm.Configuration(schemaVersion: 3){ migration, oldSchemaVersion in
         }
 
         Realm.Configuration.defaultConfiguration = config

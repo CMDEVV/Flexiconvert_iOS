@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RealmSwift
 
 
 struct CarouselView: View {
@@ -80,6 +81,85 @@ struct CarouselView: View {
         }
     }
 }
+
+
+
+
+struct CarouselViewRecentFiles: View {
+    
+    @Environment(\.dismiss) var dismiss
+//    @State var convertedImages = [APIResponse]()
+//    @ObservedResults(RecentFilesRealmModel.self) var recentFilesImages
+    
+//    @State var recentFilesImages = [RecentFilesRealmModel]()
+    var recentFilesImages: RecentFilesRealmModel
+
+    let timer = Timer.publish(every: 2.5, on: .main, in: .common).autoconnect()
+    
+    @State private var selectedImageIndex: Int = 0
+    
+    func base64ToImage(_ base64: String) -> UIImage? {
+        guard let data = Data(base64Encoded: base64, options: .ignoreUnknownCharacters),
+              let image = UIImage(data: data) else {
+            return nil
+        }
+        return image
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.secondary
+                .ignoresSafeArea()
+
+            TabView(selection: $selectedImageIndex) {
+//                ForEach(recentFilesImages, id: \._id) { result in
+                    if let uiImage = base64ToImage(recentFilesImages.image.base64EncodedString()) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 300, height: 400)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    } else {
+                        Text("Invalid Image")
+                    }
+//                }
+            }
+            .frame(height: 500)
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .ignoresSafeArea()
+            
+//            HStack {
+//                ForEach(0..<recentFilesImages.count, id: \.self) { index in
+//                    Capsule()
+//                        .fill(Color.white.opacity(selectedImageIndex == index ? 1 : 0.33))
+//                        .frame(width: 35, height: 8)
+//                        .onTapGesture {
+//                            selectedImageIndex = index
+//                        }
+//                }
+//                .offset(y: 250)
+//            }
+        }
+        .onAppear{
+            print("recentFilesImagesCarousel", recentFilesImages)
+        }
+        .overlay(alignment: .topTrailing){
+            Button{
+                dismiss()
+            } label: {
+                Image(systemName: "x.circle").imageScale(.large)
+                    .foregroundStyle(Color.black)
+            }
+            .padding()
+        }
+        .onReceive(timer) { _ in
+//            withAnimation(.default) {
+//                selectedImageIndex = (selectedImageIndex + 1) % recentFilesImages.count
+//            }
+        }
+    }
+}
+
 
 
 struct VisualEffectBlur<Content: View>: View {

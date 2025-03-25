@@ -20,14 +20,15 @@ enum ConvertStatus{
 //    let image: String?
 //    let format: String?
 //    let file_name: String?
-//}
+// }
 
 struct ImageExtensionSheet: View {
     // String/array
     @State var extensionSelected: String = ""
     @State private var responseText: String = ""
 
-    let extensions = ["PNG", "JPEG", "GIF", "SVG"]
+//    let extensions = ["PNG", "JPEG", "GIF", "SVG"]
+    let extensions = ["PNG", "JPEG"]
     let rows = [GridItem(.fixed(50))]
     
     // Bool
@@ -96,9 +97,6 @@ struct ImageExtensionSheet: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
     
-    // set a timer for 3-5 seconds
-    // 1. show success text
-    // 2. after timer show convert text
     private var successConvertButton: some View {
         VStack(spacing: 5){
             Button{

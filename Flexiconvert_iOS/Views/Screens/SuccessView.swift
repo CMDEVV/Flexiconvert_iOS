@@ -133,10 +133,13 @@ struct SuccessView: View {
                 for data in convertedImages{
                     for image in data.results{
                         try! realm.write{
+                            
                             let recentFilesList = RecentFilesRealmModel()
                             recentFilesList.format = image.format
                             recentFilesList.file_name = image.file_name
-                            recentFilesList.image = image.image
+                            if let imageData = Data(base64Encoded: image.image){
+                                recentFilesList.image = imageData
+                            }
                             recentFilesList.date = formatDate(date: date)
                             
                             realm.add(recentFilesList, update: .all)
@@ -155,9 +158,6 @@ struct SuccessView: View {
             .fullScreenCover(isPresented: $goToCarousel){
                 CarouselView(convertedImages: convertedImages)
             }
-//            .navigationDestination(isPresented: $goToCarousel){
-//                CarouselView(imageNames: [""])
-//            }
         }
     }
     
@@ -182,6 +182,7 @@ struct SuccessView: View {
             for result in convertedImages {
                 for data in result.results {
                     if let uiImage = base64ToImage(data.image) {
+                
                         imagesToShare.append(uiImage)
                     }
                 }
@@ -189,9 +190,6 @@ struct SuccessView: View {
             
             isSharing = true
 
-//            if !imagesToShare.isEmpty {
-//                isSharing = true
-//            }
         } label: {
             Image(systemName: "arrow.turn.up.right")
                 .imageScale(.large)
@@ -201,6 +199,7 @@ struct SuccessView: View {
         .background(Color.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 15))
     }
+    
     
     private var DownloadImage: some View {
            Button {
@@ -254,6 +253,10 @@ struct SuccessView: View {
                downloadStatus = "Saved \(savedCount) images!"
            } else {
                downloadStatus = "No images to save."
+           }
+           
+           DispatchQueue.main.asyncAfter(deadline: .now() + 5){
+               self.downloadStatus = nil 
            }
        }
 }

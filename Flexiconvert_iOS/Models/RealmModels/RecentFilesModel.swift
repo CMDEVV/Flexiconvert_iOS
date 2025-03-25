@@ -14,6 +14,6 @@ class RecentFilesRealmModel: Object, Identifiable {
     @Persisted var format: String
     @Persisted var file_name: String
     @Persisted var date: String
-    @Persisted var image: String = ""
-//    @Persisted var image: Data? = nil
+    @Persisted var image: Data
+//    @Persisted var image: String = ""
 }
