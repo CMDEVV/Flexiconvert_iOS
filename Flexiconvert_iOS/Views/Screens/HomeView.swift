@@ -29,8 +29,12 @@ struct HomeView: View {
         }
         return image
     }
-    
+    // Realm Variables
     @ObservedResults(RecentFilesRealmModel.self, sortDescriptor: SortDescriptor(keyPath: "date", ascending: false)) var recentFiles
+    
+    
+    // Models
+    @State var categoryType : [CategoryType] = CategoryType.CategoryTypeList
 
     
     var body: some View {
@@ -140,19 +144,27 @@ struct HomeView: View {
                             goToDetailView = true
                         }
                         
-                        HStack(spacing: 80){
-                            Text("PNG")
-                                .font(.headline)
-                            
-                            Image(systemName: "arrow.forward")
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(Color.white)
-                                .background(Color(hex: 0x080f90))
-                                .clipShape(Circle())
-                                
-                            
-                            Text("JPEG")
-                                .font(.headline)
+                        ForEach(categoryType, id: \.id){ result in
+                            NavigationLink(destination: DetailView(categoryTypeSelected: result), label: {
+                                HStack(spacing: 80){
+                                    
+                                    Text(result.orginal)
+                                        .font(.headline)
+                                        .foregroundStyle(Color.black)
+                                    
+                                    Image(systemName: "arrow.forward")
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(Color.white)
+                                        .background(Color(hex: 0x080f90))
+                                        .clipShape(Circle())
+                                    
+                                    Text(result.target)
+                                        .font(.headline)
+                                        .foregroundStyle(Color.black)
+                                    
+                                }
+                            })
+                          
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 104)
@@ -160,25 +172,6 @@ struct HomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: Color.gray.opacity(0.3), radius: 3, x: 0, y: 1)
                         
-                        HStack(spacing: 80){
-                            Text("PNG")
-                                .font(.headline)
-                            
-                            Image(systemName: "arrow.forward")
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(Color.white)
-                                .background(Color(hex: 0x080f90))
-                                .clipShape(Circle())
-                                
-                            
-                            Text("JPEG")
-                                .font(.headline)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 104)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .shadow(color: Color.gray.opacity(0.3), radius: 3, x: 0, y: 1)
                     }
                     .padding(1)
                 }

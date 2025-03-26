@@ -263,6 +263,8 @@ struct RecentFilesView: View {
         }
     }
     
+   
+    
     
     /// Save images to Photos app
     func saveImagesToPhotos(image: RecentFilesRealmModel) {

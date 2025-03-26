@@ -1,30 +1,19 @@
 //
-//  ImageExtensionSheet.swift
+//  SpecificImageExtensionSheet.swift
 //  Flexiconvert_iOS
 //
-//  Created by Carlos Mendez on 2/26/25.
+//  Created by Carlos Mendez on 3/25/25.
 //
+
+
 
 import SwiftUI
 
-enum ConvertStatus{
-    case idle
-    case uploading
-    case success
-    case failure
-}
+struct SpecificImageExtensionSheet: View {
+//    @State private var categorySelected = String()
 
-
-//struct StoreResultItem: Codable, Identifiable {
-//    var id = UUID()
-//    let image: String?
-//    let format: String?
-//    let file_name: String?
-// }
-
-struct ImageExtensionSheet: View {
     // String/array
-    @State var extensionSelected: String = ""
+    @State private var extensionSelected: String = ""
     @State private var responseText: String = ""
 
 //    let extensions = ["PNG", "JPEG", "GIF", "SVG"]
@@ -42,6 +31,7 @@ struct ImageExtensionSheet: View {
     
     @State var apiResponse : APIResponse?
     @State var storeResultItem = [APIResponse]()
+    @State var categoryTypeSelected: CategoryType?
     
     var body: some View {
 //        NavigationStack{
@@ -52,27 +42,37 @@ struct ImageExtensionSheet: View {
                 
                 ScrollView(.horizontal){
                     LazyHGrid(rows: rows){
-                        ForEach(extensions, id: \.self){ item in
-                            VStack{
-                                Button{
-                                    extensionSelected = item
-                                    print("extensionSelecteddd", extensionSelected)
-                                } label: {
-                                    Text(item)
-                                }
+//                        ForEach(extensions, id: \.self){ item in
+//                            VStack{
+//                                Button{
+//                                    extensionSelected = item
+//                                    print("extensionSelecteddd", extensionSelected)
+//                                } label: {
+//                                    Text(item)
+//                                }
+//                            }
+                            Button{
+                                extensionSelected = categoryTypeSelected?.target ?? ""
+                                print("extensionSelecteddd", extensionSelected)
+                            } label: {
+                                Text("\(categoryTypeSelected?.target ?? "")")
                             }
                             .frame(width: 60, height: 40)
-                            .background(extensionSelected == item ? Color(hex: 0x080f90) : Color.white)
-                            .foregroundStyle(extensionSelected == item ? Color.white : Color.black)
+                            .background(extensionSelected == categoryTypeSelected?.target ? Color(hex: 0x080f90) : Color.white)
+                            .foregroundStyle(extensionSelected == categoryTypeSelected?.target ? Color.white : Color.black)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .shadow(color: Color.gray.opacity(0.3), radius: 2, x: 0, y: 1)
-                        }
+//                        }
                     }
                 }
                 
                 Spacer()
                 
                 StatusOfConvert
+            }
+            .onAppear{
+                print("selectedImagesSpecific", selectedImages)
+                print("categorySelecteddd", categoryTypeSelected)
             }
             .padding()
             .fullScreenCover(isPresented: $goToSuccessView){
@@ -223,8 +223,76 @@ struct ImageExtensionSheet: View {
             request.setValue(token, forHTTPHeaderField: "X-CSRFToken")
             
             var imagesPayload: [[String: Any]] = []
-
+//            for index in selectedImages.indices {
+////                let ext = extensionSelected.lowercased()
+//                let ext = imageExtensions[index].lowercased()
+//                let conversionType: String
+////                var conversionType = extensionSelected
+//
+//                // image -> jpeg
+//                // ext_selected -> png
+//                if ext == "png" {
+//                    conversionType = "png_to_jpeg"
+//                } else if ext == "jpg" || ext == "jpeg" {
+//                    conversionType = "jpeg_to_png"
+//                } else {
+//                    conversionType = "png_to_jpeg"
+//                }
+//
+//                // Convert the UIImage accordingly.
+//                let imageData: Data?
+//                if conversionType == "png_to_jpeg" {
+//                    imageData = selectedImages[index].jpegData(compressionQuality: 1.0)
+//                } else {
+//                    imageData = selectedImages[index].pngData()
+//                }
+//                print("imageDataFound for index \(index):", imageData as Any)
+//                guard let data = imageData else { continue }
+//                print("DataFOUND for index \(index):", data)
+//                let base64String = data.base64EncodedString()
+//
+//                // I need to pass the image width and height
+//                // Adjust the payload keys if you want to remove quality/width/height.
+//                imagesPayload.append([
+//                    "conversion_type": conversionType,
+//                    "image": base64String,
+//                    "quality": 90,
+//                ])
+//            }
+            
+            // converting the images based on the extension selected
+        
+//            for index in selectedImages.indices {
+//                let originalExt = imageExtensions[index].lowercased()
+//                let targetExt = extensionSelected.lowercased()
+//
+//                // Example: png_to_jpeg
+//                let conversionType = "\(originalExt)_to_\(targetExt)"
+//
+//                // Convert image based on TARGET extension
+//                let imageData: Data?
+//                switch targetExt {
+//                case "jpeg", "jpg":
+//                    imageData = selectedImages[index].jpegData(compressionQuality: 1.0)
+//                case "png":
+//                    imageData = selectedImages[index].pngData()
+//                default:
+//                    // You can add more formats here
+//                    imageData = selectedImages[index].jpegData(compressionQuality: 1.0)
+//                }
+//
+//                guard let data = imageData else { continue }
+//                let base64String = data.base64EncodedString()
+//
+//                imagesPayload.append([
+//                    "conversion_type": conversionType,
+//                    "image": base64String,
+//                    "quality": 90,
+//                ])
+//            }
+          
             for index in selectedImages.indices {
+                
                 let originalExt = imageExtensions[index].lowercased()
                 let targetExt = extensionSelected.lowercased()
                 
@@ -265,9 +333,9 @@ struct ImageExtensionSheet: View {
                 ])
             }
 
-
             
             let parameters: [String: Any] = ["images": imagesPayload]
+            
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
             } catch {

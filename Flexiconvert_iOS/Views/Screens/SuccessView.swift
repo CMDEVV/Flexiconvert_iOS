@@ -33,7 +33,9 @@ struct SuccessView: View {
     @State var goToHome = false
     @State var goToCarousel = false
     @State var convertedImages = [APIResponse]()
-    
+    @State private var activityItems: [Any] = []
+    @State private var triggerShare = false
+
     // State for images to share
     @State private var imagesToShare: [UIImage] = []
     @State private var isSharing = false
@@ -147,12 +149,17 @@ struct SuccessView: View {
                     }
                 }
             }
+            .onChange(of: triggerShare) { _ in
+                if !activityItems.isEmpty {
+                    isSharing = true
+                }
+            }
             .navigationDestination(isPresented: $goToHome) {
                 HomeView()
             }
             .sheet(isPresented: $isSharing) {
-                if !imagesToShare.isEmpty {
-                    ShareSheet(activityItems: imagesToShare)
+                if !activityItems.isEmpty {
+                    ShareSheet(activityItems: activityItems)
                 }
             }
             .fullScreenCover(isPresented: $goToCarousel){
@@ -175,21 +182,36 @@ struct SuccessView: View {
         .clipShape(RoundedRectangle(cornerRadius: 15))
     }
     
+//    private var ShareImage: some View {
+//        Button {
+////            imagesToShare.removeAll() // Clear previous selection
+//            
+//            for result in convertedImages {
+//                for data in result.results {
+//                    print("Share_fileName", data.file_name)
+//                    print("Share_format", data.format)
+//                    if let uiImage = base64ToImage(data.image) {
+//                        imagesToShare.append(uiImage)
+//                    }
+//                }
+//            }
+//            
+//            isSharing = true
+//
+//        } label: {
+//            Image(systemName: "arrow.turn.up.right")
+//                .imageScale(.large)
+//                .foregroundStyle(Color.black)
+//                .frame(width: 115, height: 77)
+//        }
+//        .background(Color.gray.opacity(0.3))
+//        .clipShape(RoundedRectangle(cornerRadius: 15))
+//    }
+    
     private var ShareImage: some View {
         Button {
-//            imagesToShare.removeAll() // Clear previous selection
-            
-            for result in convertedImages {
-                for data in result.results {
-                    if let uiImage = base64ToImage(data.image) {
-                
-                        imagesToShare.append(uiImage)
-                    }
-                }
-            }
-            
-            isSharing = true
-
+            activityItems = createTempFilesForSharing()
+            triggerShare.toggle() // Tells SwiftUI "something changed"
         } label: {
             Image(systemName: "arrow.turn.up.right")
                 .imageScale(.large)
@@ -199,6 +221,8 @@ struct SuccessView: View {
         .background(Color.gray.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 15))
     }
+
+
     
     
     private var DownloadImage: some View {
@@ -219,6 +243,32 @@ struct SuccessView: View {
            .background(Color.gray.opacity(0.3))
            .clipShape(RoundedRectangle(cornerRadius: 15))
        }
+    
+    func createTempFilesForSharing() -> [URL] {
+        var fileURLs: [URL] = []
+        
+        for result in convertedImages {
+            for data in result.results {
+                if let imageData = Data(base64Encoded: data.image) {
+                    let tempDir = FileManager.default.temporaryDirectory
+                    let fileNameWithoutExt = (data.file_name as NSString).deletingPathExtension
+                    let ext = data.format.lowercased()
+                    let filename = "\(UUID().uuidString).\(ext)"
+                    let fileURL = tempDir.appendingPathComponent(filename)
+                    
+                    do {
+                        try imageData.write(to: fileURL)
+                        fileURLs.append(fileURL)
+                    } catch {
+                        print("❌ Failed to write image to temp file: \(error)")
+                    }
+                }
+            }
+        }
+        
+        return fileURLs
+    }
+
        
        /// Request Photo Library Permission
        func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
