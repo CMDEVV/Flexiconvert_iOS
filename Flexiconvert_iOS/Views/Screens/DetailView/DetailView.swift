@@ -56,12 +56,6 @@ struct DetailView: View {
             // MARK: PlaceHolder
 //            EmptyImageView()
             
-            // Get the image ext. if the image ext. does not match the original, Add red border
-            // Need to add delete button, to give the user the freedom of deleting images (future version)
-            // if the user clicks on convert button and if there are images with red border advice the user with an error that only images with the original format can be converted
-            // 
-            
-            
             VStack{
                 if selectedImages.isEmpty{
                     EmptyImageView()
@@ -97,7 +91,10 @@ struct DetailView: View {
                                     Image(uiImage: selectedImages[index])
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
-                                        .frame(width: 175, height: 201)
+//                                        .frame(width: 175, height: 201)
+//                                        .frame(maxWidth: .infinity)
+                                        .frame(width: UIDevice.isIPad ? 380 : 175)
+                                        .frame(height: UIDevice.isIPad ? 400 : 201)
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
                                         .overlay{
                                             if categoryTypeSelected != nil{
@@ -115,7 +112,7 @@ struct DetailView: View {
 //                                        )
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 10)
-                                                .stroke(selectedIndices.contains(index) ? Color.blue : Color.clear, lineWidth: 4)
+                                                .stroke(selectedIndices.contains(index) ? Color(hex: 0x080f90) : Color.clear, lineWidth: 4)
                                         )
                                         .onTapGesture {
                                             if selectImages {

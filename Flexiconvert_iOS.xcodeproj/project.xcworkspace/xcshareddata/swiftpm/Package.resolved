@@ -1,6 +1,15 @@
 {
-  "originHash" : "bd43a4a5303008e646fbdedf77dd2ed5b69391425e3638f5b3ea6781f0a0cf97",
+  "originHash" : "a9b5736b51764d05c5be28be21b2c21bae77322f198805878004d2fbb4c65821",
   "pins" : [
+    {
+      "identity" : "popups",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mijick/Popups.git",
+      "state" : {
+        "revision" : "62457a91042e8ef68615fd8d2d27eb8240d2cd5b",
+        "version" : "4.0.1"
+      }
+    },
     {
       "identity" : "realm-cocoa",
       "kind" : "remoteSourceControl",

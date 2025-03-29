@@ -150,7 +150,11 @@ struct ImageExtensionSheet: View {
             case .idle:
                 convertButton
             case .uploading:
+                HStack{
+                    Spacer()
                     ProgressView()
+                    Spacer()
+                }
             case .success:
                 successConvertButton
                     .onAppear{
@@ -162,13 +166,22 @@ struct ImageExtensionSheet: View {
         }
     }
     
-    
+    func getAPIKey() -> String? {
+        if let path = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
+           let dict = NSDictionary(contentsOfFile: path) as? [String: Any],
+           let apiKey = dict["SERVER_KEY"] as? String {
+            return apiKey
+        }
+        return nil
+    }
+  
     
     func fetchCSRFToken(completion: @escaping (String?) -> Void) {
-        guard let url = URL(string: "") else {
+        guard let url = URL(string: "\(getAPIKey() ?? "")get-csrf-token/") else {
             completion(nil)
             return
         }
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 print("Error fetching token: \(error.localizedDescription)")
@@ -210,7 +223,7 @@ struct ImageExtensionSheet: View {
             
             print("Token_CSRF:", token)
             
-            guard let url = URL(string: "") else {
+            guard let url = URL(string: "\(getAPIKey() ?? "")convert-file/") else {
                 DispatchQueue.main.async {
                     self.responseText = "Invalid URL."
                 }

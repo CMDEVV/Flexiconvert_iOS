@@ -87,7 +87,9 @@ struct CarouselView: View {
 
 struct CarouselViewRecentFiles: View {
     
+    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    @Binding var goToCarousel: Bool
 //    @State var convertedImages = [APIResponse]()
 //    @ObservedResults(RecentFilesRealmModel.self) var recentFilesImages
     
@@ -139,24 +141,28 @@ struct CarouselViewRecentFiles: View {
 //                }
 //                .offset(y: 250)
 //            }
+            
         }
         .onAppear{
             print("recentFilesImagesCarousel", recentFilesImages)
         }
         .overlay(alignment: .topTrailing){
             Button{
-                dismiss()
+//                dismiss()
+//                presentationMode.wrappedValue.dismiss()
+                goToCarousel = false
+                print("Clicked Button X")
             } label: {
                 Image(systemName: "x.circle").imageScale(.large)
                     .foregroundStyle(Color.black)
             }
             .padding()
         }
-        .onReceive(timer) { _ in
+//        .onReceive(timer) { _ in
 //            withAnimation(.default) {
 //                selectedImageIndex = (selectedImageIndex + 1) % recentFilesImages.count
 //            }
-        }
+//        }
     }
 }
 

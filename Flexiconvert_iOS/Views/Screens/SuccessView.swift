@@ -8,6 +8,7 @@
 import SwiftUI
 import Photos
 import RealmSwift
+import MijickPopups
 
 struct APIResponse: Codable{
 //    var id = UUID()
@@ -30,6 +31,8 @@ struct SuccessView: View {
         GridItem(),
     ]
     
+    @State private var isPopupShowing = false
+    @State private var downloadedImages = false
     @State var goToHome = false
     @State var goToCarousel = false
     @State var convertedImages = [APIResponse]()
@@ -61,6 +64,9 @@ struct SuccessView: View {
     var body: some View {
         NavigationStack {
             VStack {
+//                    TopPopupView(message: "Hello! This is a custom popup.", duration: 3, isShowing: $isPopupShowing)
+                
+
                 HStack {
                     Spacer()
                     Button {
@@ -80,7 +86,9 @@ struct SuccessView: View {
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
-                                        .frame(width: 175, height: 201)
+//                                        .frame(width: 175, height: 201)
+                                        .frame(width: UIDevice.isIPad ? 380 : 175)
+                                        .frame(height: UIDevice.isIPad ? 400 : 201)
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
                                         .overlay(alignment: .bottomLeading) {
                                             VStack(alignment: .leading, spacing: 8) {
@@ -114,13 +122,24 @@ struct SuccessView: View {
                 }
                 .padding(.top, 15)
                 
+//                Button{
+//                    print("CLICKED_SUCCESS")
+//                    Task{
+//                        await TopPopupConvertedFiles().present()
+//                    }
+//                  
+//                } label: {
+//                    Text("Button WOW")
+//                }
+//                .zIndex(1)
+                
                 
                 // Show download status
-                if let status = downloadStatus {
-                    Text(status)
-                        .foregroundColor(.green)
-                        .padding()
-                }
+//                if let status = downloadStatus {
+//                    Text(status)
+//                        .foregroundColor(.green)
+//                        .padding()
+//                }
                 
                 HStack(spacing: 10) {
                     ViewImage
@@ -130,6 +149,12 @@ struct SuccessView: View {
             }
             .padding()
             .padding(.top, 30)
+            .overlay(
+                TopPopupView(message: "Images Converted Successfully", duration: 3, isShowing: $isPopupShowing)
+            )
+            .overlay(
+                TopPopupView(message: self.downloadStatus ?? "", duration: 3, isShowing: $downloadedImages)
+            )
             .onAppear{
                 let date = Date()
                 for data in convertedImages{
@@ -148,6 +173,13 @@ struct SuccessView: View {
                         }
                     }
                 }
+                
+                isPopupShowing = true
+                
+//                Task{
+//                    await TopPopupConvertedFiles().present()
+//                }
+                
             }
             .onChange(of: triggerShare) { _ in
                 if !activityItems.isEmpty {
@@ -165,7 +197,24 @@ struct SuccessView: View {
             .fullScreenCover(isPresented: $goToCarousel){
                 CarouselView(convertedImages: convertedImages)
             }
+            .registerPopups(id: .shared) { config in config
+                    .vertical { $0
+                        .enableDragGesture(true)
+                        .tapOutsideToDismissPopup(true)
+                        .cornerRadius(32)
+                    }
+                    .center { $0
+                        .tapOutsideToDismissPopup(false)
+                        .backgroundColor(.white)
+                    }
+            }
         }
+       
+//        .onAppear{
+//            Task{
+//                await TopPopupConvertedFiles().present()
+//            }
+//        }
     }
     
     private var ViewImage: some View {
@@ -230,6 +279,7 @@ struct SuccessView: View {
                requestPhotoLibraryPermission { granted in
                    if granted {
                        saveImagesToPhotos()
+                       
                    } else {
                        downloadStatus = "Permission Denied"
                    }
@@ -251,7 +301,7 @@ struct SuccessView: View {
             for data in result.results {
                 if let imageData = Data(base64Encoded: data.image) {
                     let tempDir = FileManager.default.temporaryDirectory
-                    let fileNameWithoutExt = (data.file_name as NSString).deletingPathExtension
+//                    let fileNameWithoutExt = (data.file_name as NSString).deletingPathExtension
                     let ext = data.format.lowercased()
                     let filename = "\(UUID().uuidString).\(ext)"
                     let fileURL = tempDir.appendingPathComponent(filename)
@@ -301,12 +351,13 @@ struct SuccessView: View {
            
            if savedCount > 0 {
                downloadStatus = "Saved \(savedCount) images!"
+               downloadedImages = true
            } else {
                downloadStatus = "No images to save."
            }
            
            DispatchQueue.main.asyncAfter(deadline: .now() + 5){
-               self.downloadStatus = nil 
+               self.downloadStatus = nil
            }
        }
 }

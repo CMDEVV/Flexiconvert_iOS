@@ -144,13 +144,15 @@ struct HomeView: View {
                             goToDetailView = true
                         }
                         
-                        ForEach(categoryType, id: \.id){ result in
-                            NavigationLink(destination: DetailView(categoryTypeSelected: result), label: {
-                                HStack(spacing: 80){
-                                    
+                        ForEach(categoryType, id: \.id) { result in
+                            NavigationLink(destination: DetailView(categoryTypeSelected: result)) {
+                                HStack {
                                     Text(result.orginal)
                                         .font(.headline)
                                         .foregroundStyle(Color.black)
+                                        .frame(width: 120, alignment: .leading) // Fixed width
+
+                                    Spacer()
                                     
                                     Image(systemName: "arrow.forward")
                                         .frame(width: 30, height: 30)
@@ -158,19 +160,22 @@ struct HomeView: View {
                                         .background(Color(hex: 0x080f90))
                                         .clipShape(Circle())
                                     
+                                    Spacer()
+                                    
                                     Text(result.target)
                                         .font(.headline)
                                         .foregroundStyle(Color.black)
-                                    
+                                        .frame(width: 120, alignment: .trailing) // Fixed width
                                 }
-                            })
-                          
+                                .padding(.horizontal, 16)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 104)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .shadow(color: Color.gray.opacity(0.3), radius: 3, x: 0, y: 1)
                         }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 104)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .shadow(color: Color.gray.opacity(0.3), radius: 3, x: 0, y: 1)
+
                         
                     }
                     .padding(1)

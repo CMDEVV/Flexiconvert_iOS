@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MijickPopups
 
 @main
 struct Flexiconvert_iOSApp: App {
@@ -14,6 +15,17 @@ struct Flexiconvert_iOSApp: App {
     var body: some Scene {
         WindowGroup {
                 TabBar()
+                .registerPopups(id: .shared) { config in config
+                        .vertical { $0
+                            .enableDragGesture(true)
+                            .tapOutsideToDismissPopup(true)
+                            .cornerRadius(32)
+                        }
+                        .center { $0
+                            .tapOutsideToDismissPopup(false)
+                            .backgroundColor(.white)
+                        }
+                }
             
 //            HomeView()
 //                .preferredColorScheme(.light)

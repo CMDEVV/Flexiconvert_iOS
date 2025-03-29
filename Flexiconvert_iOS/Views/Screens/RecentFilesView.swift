@@ -8,6 +8,8 @@
 import SwiftUI
 import RealmSwift
 import Photos
+import MijickPopups
+
 
 
 struct RecentFilesView: View {
@@ -19,11 +21,17 @@ struct RecentFilesView: View {
     @State var selectAllImages = Bool()
     @State var goToCarousel = false
     @State var isSharing = false
-    @State private var downloadStatus: String? = nil
+//    @State private var downloadStatus: String? = nil
+    @State private var downloadStatus = String()
     @State private var imagesToShare: [UIImage] = []
 //    @State private var selectedImages: Set<Int> = []
     @State private var selectedImages: Set<ObjectId> = []
     @State private var selectedImagesToDelete = [RecentFilesRealmModel]()
+    
+    @State private var activityItems: [Any] = []
+    @State private var triggerShare = false
+    @State private var isPopupShowing = false
+
 
 
     
@@ -41,17 +49,6 @@ struct RecentFilesView: View {
     }
     
     
-//    private func toggleSelection(for index: Int, image: RecentFilesRealmModel) {
-//    private func toggleSelection(for index: Int) {
-//          if selectedImages.contains(index) {
-//              selectedImages.remove(index)
-////              selectedImagesToDelete.removeAll(where: {$0._id == image._id})
-//          } else {
-//              selectedImages.insert(index)
-////              selectedImagesToDelete.append(image)
-////              selectedImagesToDelete.insert(image, at: 0)
-//          }
-//      }
     
     private func toggleSelection(for image: RecentFilesRealmModel) {
         let id = image._id
@@ -68,7 +65,7 @@ struct RecentFilesView: View {
     var body: some View {
         VStack{
             
-            if recentFiles.isEmpty{
+            if recentFiles.isEmpty {
                 Image("nofile_icon")
                     .resizable()
                     .renderingMode(.template)
@@ -120,7 +117,9 @@ struct RecentFilesView: View {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
-                                    .frame(width: 175, height: 201)
+//                                    .frame(width: 175, height: 201)
+                                    .frame(width: UIDevice.isIPad ? 380 : 175)
+                                    .frame(height: UIDevice.isIPad ? 400 : 201)
                                     .background(selectAllImages && selectedImages.contains(image._id) ? Color(hex: 0x080f90) : Color.clear)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                     .overlay(
@@ -138,6 +137,13 @@ struct RecentFilesView: View {
                                                 // MARK: Download
                                                 Button{
                                                     saveImagesToPhotos(image: image)
+                                                    isPopupShowing = true 
+//                                                    Task{
+//                                                        await TopPopupSavedImages(downloadStatus: $downloadStatus).present()
+//                                                    }
+                                                    
+                                                       
+                                                    
                                                 } label: {
                                                     HStack{
                                                         Image(systemName: "square.and.arrow.down")
@@ -150,33 +156,34 @@ struct RecentFilesView: View {
                                                 }
                                                 
                                                 // MARK: Share
-                                                Button{
-                                                    
-                                                    // if let uiImagess = base64ToImage(image.image.base64EncodedData()){
-                                                    imagesToShare.append(uiImage)
-                                                    // }
-                                                    
-                                                    isSharing = true
-                                                } label: {
-                                                    HStack{
-                                                        Image(systemName: "arrow.turn.up.right")
-                                                            .imageScale(.large)
-                                                            .foregroundStyle(Color.black)
-                                                        
-                                                        Text("Share")
+                                            
+                                                    Button {
+                                                        imageSelected = image
+                                                        activityItems = createTempFilesForSharing()
+                                                        triggerShare.toggle()
+                                                       
+                                                    } label: {
+                                                        HStack{
+                                                            Image(systemName: "arrow.turn.up.right")
+                                                                .imageScale(.large)
+                                                                .foregroundStyle(Color.black)
+                                                                .frame(width: 115, height: 77)
+                                                            
+                                                            Text("Share")
+                                                        }
                                                     }
-                                                }
+                                                    .background(Color.gray.opacity(0.3))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                                
                                                 
                                                 // MARK: View
                                                 
                                                 Button{
-                                                    // DispatchQueue.main.async{
                                                     self.imageSelected = image
-                                                    //  }
-                                                    print("imageSelected", imageSelected!)
-                                                    // if !self.imageSelected.isEmpty{
-                                                    self.goToCarousel = true
-                                                    // }
+//                                                    print("ImageSelectedDataaa", self.imageSelected)
+                                                    goToCarousel.toggle()
+//                                                    self.goToCarousel = true
+                                               
                                                 } label: {
                                                     HStack{
                                                         Image(systemName: "eye")
@@ -230,17 +237,36 @@ struct RecentFilesView: View {
                         }
                         
                     }
+//                    .onChange(of: goToCarousel) { _ in
+//                        if imageSelected != nil{
+//                            goToCarousel = true
+//                        }
+//                    }
                 }
+                .onChange(of: imageSelected) { newImage in
+                    if newImage != nil {
+                        goToCarousel = true
+                    }
+                }
+                .onChange(of: triggerShare) { _ in
+                    if !activityItems.isEmpty {
+                        isSharing = true
+                    }
+                }
+               
             }
         }
+        .overlay(
+            TopPopupView(message: self.downloadStatus, duration: 3, isShowing: $isPopupShowing)
+        )
         .safeAreaInset(edge: .bottom){
             Group{
                 // Show download status
-                if let status = downloadStatus {
-                    Text(status)
-                        .foregroundColor(.green)
-                        .padding()
-                }
+//                if let status = downloadStatus {
+//                    Text(downloadStatus)
+//                        .foregroundColor(.green)
+//                        .padding()
+//                }
                 
                 if selectAllImages{
                     HStack(spacing: 10) {
@@ -250,21 +276,36 @@ struct RecentFilesView: View {
             }
         }
         .toolbar(selectAllImages ? .hidden : .visible, for: .tabBar)
+     
         .sheet(isPresented: $isSharing) {
-            if !imagesToShare.isEmpty {
-                let imageS = imagesToShare[0]
-                
-            
-                ShareSheet(activityItems: [imageS])
+            if !activityItems.isEmpty {
+                ShareSheet(activityItems: activityItems)
             }
         }
         .fullScreenCover(isPresented: $goToCarousel){
-            CarouselViewRecentFiles(recentFilesImages: self.imageSelected ?? RecentFilesRealmModel())
+            CarouselViewRecentFiles(goToCarousel: $goToCarousel, recentFilesImages: self.imageSelected ?? RecentFilesRealmModel())
         }
     }
     
    
-    
+    func createTempFilesForSharing() -> [URL] {
+        var fileURLs: [URL] = []
+        
+        let imageData = imageSelected?.image
+        let tempDir = FileManager.default.temporaryDirectory
+        let ext = imageSelected?.format.lowercased()
+        let filename = "\(UUID().uuidString).\(ext ?? "")"
+        let fileURL = tempDir.appendingPathComponent(filename)
+        
+        do {
+            try imageData?.write(to: fileURL)
+            fileURLs.append(fileURL)
+        } catch {
+            print("❌ Failed to write image to temp file: \(error)")
+        }
+        
+        return fileURLs
+    }
     
     /// Save images to Photos app
     func saveImagesToPhotos(image: RecentFilesRealmModel) {
@@ -281,8 +322,9 @@ struct RecentFilesView: View {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-            downloadStatus = nil
+            downloadStatus = ""
         }
+        
     }
     
     
